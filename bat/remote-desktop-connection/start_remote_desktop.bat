@@ -1,0 +1,6 @@
+@echo off
+
+SET MACHINE_HOST_NAME=XXXXXX
+START mstsc /v %MACHINE_HOST_NAME%
+
+@echo on
