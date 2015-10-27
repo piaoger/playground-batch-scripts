@@ -1,0 +1,1 @@
+echo %date% %time% >>C:/tasklog.txt
