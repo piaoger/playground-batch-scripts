@@ -1,3 +1,6 @@
+
+# from http://blog.zheezes.com/expect-remote-execution-under-linux-using-shell-commands-and-scripts.html
+
 __GEAR_SH="GEAR_SH"
 
 # add some path
@@ -86,7 +89,7 @@ function alarm()
 	local mobile=${1:?"no mobile"}
 	local str=$2
 	local now_time=`date '+%Y-%m-%d %H:%M:%S'`
-	
+
 	alarm msg $mobile "$now_time: $str"
 }
 
@@ -135,7 +138,7 @@ function check_proc_num()
 	elif [ $n -gt $max ]; then
 		return 3
 	fi
-	
+
 	return 0
 }
 
@@ -162,7 +165,7 @@ function wait_proc_num()
 		fi
 		if [ ${tm} -ge ${timeout} ]; then
 			return 2
-		else 
+		else
 			sleep 1
 			tm=$(($tm+1))
 		fi
@@ -205,7 +208,7 @@ function start_proc()
 		home="$1"
 		cmd="$2"
 	else
-		return 2	
+		return 2
 	fi
 
 	local pcmd=$(echo ${cmd} | awk '{print $1}') # "vi test.sh" to "vi"
@@ -229,7 +232,7 @@ function start_proc()
 }
 
 # int start_proc_num (home, cmd, [num = 1], [max = num], [timeout = 3])
-function start_proc_num() 
+function start_proc_num()
 {
 	if [ $# -lt 2 ]; then
 		return 2
@@ -318,19 +321,19 @@ function ta_start_proc()
 	done < "${plf}"
 
 	return 0
-} 
+}
 
 # int ftp_put_file(host, port, user, passwd, src, dst)
 # deprecated, replace by ssh
 # 0, succ
 # 1, fail
-function ftp_put_file() 
+function ftp_put_file()
 {
 	if [ $# -lt 6 ]; then
 		echo "invalid params"
 		return 1
 	fi
-		
+
 	local host=$1
 	local port=$2
 	local user=$3
@@ -372,28 +375,28 @@ function ssh_put()
 	expect -c "
 		set timeout $timeout;
 		set flag 0
-		spawn rsync -aq --bwlimit=$limit $src $user@$host:$dst; 
+		spawn rsync -aq --bwlimit=$limit $src $user@$host:$dst;
 		expect {
-			\"*assword\" { 
-				send $passwd\r; 
+			\"*assword\" {
+				send $passwd\r;
 			}
-			\"yes\/no)?\" { 
-				set flag 1; 
+			\"yes\/no)?\" {
+				set flag 1;
 				send yes\r;
 			}
-			eof { 
-				exit 0; 
+			eof {
+				exit 0;
 			}
 		}
 		if { \$flag == 1 } {
 			expect {
-				\"*assword\" { 
-					send $passwd\r; 
+				\"*assword\" {
+					send $passwd\r;
 				}
 			}
 		}
 		expect {
-			\"*assword*\" { 
+			\"*assword*\" {
 				puts \"INVALID PASSWD, host = $host, user = $user, passwd = \'$passwd\'\";
 				exit 1
 			}
@@ -431,28 +434,28 @@ function ssh_get()
 	expect -c "
 		set timeout $timeout;
 		set flag 0
-		spawn rsync -aq --bwlimit=$limit $user@$host:$src $dst; 
+		spawn rsync -aq --bwlimit=$limit $user@$host:$src $dst;
 		expect {
-			\"*assword\" { 
-				send $passwd\r; 
+			\"*assword\" {
+				send $passwd\r;
 			}
-			\"yes\/no)?\" { 
-				set flag 1; 
+			\"yes\/no)?\" {
+				set flag 1;
 				send yes\r;
 			}
-			eof { 
-				exit 0; 
+			eof {
+				exit 0;
 			}
 		}
 		if { \$flag == 1 } {
 			expect {
-				\"*assword\" { 
-					send $passwd\r; 
+				\"*assword\" {
+					send $passwd\r;
 				}
 			}
 		}
 		expect {
-			\"*assword*\" { 
+			\"*assword*\" {
 				puts \"INVALID PASSWD, host = $host, user = $user, passwd = $passwd\";
 				exit 1
 			}
@@ -499,31 +502,31 @@ function exec_script()
 	fi
 
 	echo "script = ${script}, remote_script = ${rscp}"
-	ssh_put $host $port $user $passwd $script $rscp 
+	ssh_put $host $port $user $passwd $script $rscp
 
 	expect -c "
 		set timeout $timeout
 		set flag 0
 		spawn ssh $user@$host;
 		expect {
-			\"*assword*\" { send $passwd\r; } 
-			\"yes\/no)?\" { 
-				set flag 1; 
+			\"*assword*\" { send $passwd\r; }
+			\"yes\/no)?\" {
+				set flag 1;
 				send yes\r;
 			}
 			\"Welcome\" { }
 		}
 		if { \$flag == 1 } {
 			expect {
-				\"*assword\" { 
-					send $passwd\r; 
+				\"*assword\" {
+					send $passwd\r;
 				}
 			}
 		}
 		expect {
-			\"*assword*\" { 
+			\"*assword*\" {
 				puts \"INVALID PASSWD, host = $host, user = $user, passwd = $passwd\";
-				exit 1 
+				exit 1
 			}
 			\"#\ \" {} \"$\ \" {} \">\ \" {}
 		}
@@ -576,24 +579,24 @@ function exec_cmd()
 		set flag 0
 		spawn ssh $user@$host;
 		expect {
-			\"*assword*\" { send $passwd\r; } 
-			\"yes\/no)?\" { 
-				set flag 1; 
+			\"*assword*\" { send $passwd\r; }
+			\"yes\/no)?\" {
+				set flag 1;
 				send yes\r;
 			}
 			\"Welcome\" { }
 		}
 		if { \$flag == 1 } {
 			expect {
-				\"*assword\" { 
-					send $passwd\r; 
+				\"*assword\" {
+					send $passwd\r;
 				}
 			}
 		}
 		expect {
-			\"*assword*\" { 
+			\"*assword*\" {
 				puts \"INVALID PASSWD, host = $host, user = $user, passwd = $passwd\";
-				exit 1 
+				exit 1
 			}
 			\"#\ \" {} \"$\ \" {} \">\ \" {}
 		}
